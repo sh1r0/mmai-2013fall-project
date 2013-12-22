@@ -21,6 +21,7 @@ all:
 	$(CC) gabor.cpp $(CFLAGS) -c
 	$(CC) LogGabor.cpp $(CFLAGS) -c
 	$(CC) gaborUtil.o gabor.o LogGabor.o Gabor_main.cpp $(CFLAGS) -o gabor
+	rm -f *.o
 
 clean:
 	rm gabor
