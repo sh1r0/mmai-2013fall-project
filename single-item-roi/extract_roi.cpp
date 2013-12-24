@@ -41,7 +41,7 @@ int main(int argc, char const *argv[])
 	cvtColor(im_rgb, im_gray, CV_RGB2GRAY);
 
 	Mat im_bw = im_gray < 254;
-	medianBlur(im_bw, im_bw, 5);
+	medianBlur(im_bw, im_bw, 7);
 
 	unsigned char *mask = im_bw.data;
 	int height = im_bw.rows;
@@ -49,7 +49,7 @@ int main(int argc, char const *argv[])
 
 	int *dp_table = new int[height*width];
 	for (int i = 0; i < width; ++i) {
-		dp_table[i] = mask[i] > 0;
+		dp_table[i] = mask[i] > 127;
 		for (int j = 1; j < height; j++) {
 			dp_table[j*width+i] = (mask[j*width+i]) ? dp_table[(j-1)*width+i]+1 : 0;
 		}
@@ -57,17 +57,14 @@ int main(int argc, char const *argv[])
 
 	stack<elem> rect_stack;
 	int max_area = 0, max_x, max_y, max_w, max_h;
-	for (int i = height-1; i >= 0; i--) {
-		int last_zero = 0;
-		elem left;
+	elem left;
 
+	for (int i = height-1; i >= height/2; i--) {
 		for (int j = 0; j < width; j++) {
 			int h = dp_table[i*width+j];
 			if (rect_stack.empty()) {
 				if (h > 0) {
 					rect_stack.push(elem(j, h));
-				} else {
-					last_zero = j;
 				}
 			} else if (h > rect_stack.top().height) {
 				rect_stack.push(elem(j, h));
@@ -89,11 +86,12 @@ int main(int argc, char const *argv[])
 					rect_stack.pop();
 
 					if (rect_stack.empty()) {
-						if (h == 0) {
-							last_zero = j;
-						} else {
-							rect_stack.push(elem(last_zero+1, h));
+						if (h > 0) {
+							rect_stack.push(elem(left.position, h));
 						}
+						break;
+					} else if (h > rect_stack.top().height) {
+						rect_stack.push(elem(left.position, h));
 						break;
 					}
 				}
@@ -133,14 +131,12 @@ int main(int argc, char const *argv[])
 	Rect roi = Rect(x, y, w, h);
 	imwrite(output_prefix+"_patch.jpg", im_rgb(roi));
 
-	// show images for parameter tuning
-	// imshow("roi", im_rgb(roi));
-	rectangle(im_rgb, Point(x, y), Point(x + w - 1, y + h - 1), CV_RGB(0, 255, 0), 1, 8, 0);
-	rectangle(im_rgb, Point(max_x, max_y), Point(max_x+max_w-1, max_y+max_h-1), CV_RGB(255, 0, 0), 1, 8, 0);
-	// imshow("img", im_rgb);
-	// waitKey();
-	imwrite(output_prefix+"_roi.jpg", im_rgb);
-	// imwrite(output_prefix+"_mask.jpg", im_bw);
+	// output images for debugging
+	// Mat temp;
+	// im_rgb.copyTo(temp, im_bw);
+	// rectangle(temp, Point(x, y), Point(x + w - 1, y + h - 1), CV_RGB(0, 255, 0), 1, 8, 0);
+	// rectangle(temp, Point(max_x, max_y), Point(max_x+max_w-1, max_y+max_h-1), CV_RGB(255, 0, 0), 1, 8, 0);
+	// imwrite(output_prefix+"_roi.jpg", temp);
 
 	return 0;
 }
