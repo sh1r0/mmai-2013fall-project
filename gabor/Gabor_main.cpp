@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 	desc.add_options()
 		("help,h", "Print help messages")
 		("input,i", po::value<string>()->required(),"Specify input file.")
-		("output,o", po::value<string>()->default_value("."),"Specify output directory.");
+		("output,o", po::value<string>()->default_value(""),"Specify output directory.");
 
 	po::variables_map vm;
 	try {
@@ -34,9 +34,6 @@ int main(int argc, char** argv)
 	}
 
 	string inputfile = vm["input"].as<string>();
-	unsigned slash = inputfile.find_last_of("/\\");
-	unsigned dot = inputfile.find_last_of(".");
-	string name = inputfile.substr(slash+1, dot);
 
 	IplImage *img;
 	try {
@@ -60,7 +57,23 @@ int main(int argc, char** argv)
 	for (int i = 0; i < nfilter; i++) {
 		icvCalcMomentStat((real *)pMag[i], gray_img->width*gray_img->height, feature[2*i], feature[2*i+1]);
 	}
-	string outputfile = vm["output"].as<string>() + "/" + name + ".gb";
+
+	unsigned slash = inputfile.find_last_of("/\\");
+	unsigned dot = inputfile.find_last_of(".");
+	string name = inputfile.substr(slash+1, dot-slash-1);
+	string output_dir;
+
+	if (vm["output"].as<string>().empty()) {
+		if (inputfile.substr(0, slash+1).empty()) {
+			output_dir = "./";
+		} else {
+			output_dir = inputfile.substr(0, slash+1);
+		}
+	} else {
+		output_dir =  vm["output"].as<string>();
+	}
+
+	string outputfile = output_dir + name + ".gb";
 	std::ofstream output;
 	output.open(outputfile.c_str());
 	for (int i = 0; i < dimension; i++) {
