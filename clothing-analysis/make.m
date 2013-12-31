@@ -1,0 +1,3 @@
+startup
+
+uci.make
