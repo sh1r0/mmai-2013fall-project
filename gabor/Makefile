@@ -6,8 +6,8 @@ OPENCV_LIB="C:\opencv-2.4.7.2\x64\mingw\lib"
 OPENCV_VER=247
 OPENCV_FLAGS=-I$(OPENCV_INC) -L$(OPENCV_LIB) -lopencv_core$(OPENCV_VER) -lopencv_highgui$(OPENCV_VER) -lopencv_imgproc$(OPENCV_VER)
 # boost
-BOOST_INC="C:\boost\include"
-BOOST_LIB="C:\boost\x64\lib"
+BOOST_INC="D:\MinGW\include"
+BOOST_LIB="D:\MinGW\lib"
 BOOST_FLAGS=-I$(BOOST_INC) -L$(BOOST_LIB) -lboost_program_options
 # fftw
 FFTW_LIB="C:\fftw-3.3.3-dll64"
