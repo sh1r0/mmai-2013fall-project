@@ -16,3 +16,5 @@ for i = 1:3
 	t.sk2 = (t.m-mode(ceil(length(mode)/2)))/t.s; % skewness
 	feat(i*3-2:i*3) = [t.m t.s t.sk2];
 end
+
+feat(isnan(feat)) = 0;
