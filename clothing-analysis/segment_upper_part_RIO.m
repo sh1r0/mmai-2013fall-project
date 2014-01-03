@@ -43,11 +43,13 @@ end
 
 % find collar region
 function collar_region = find_collar_region(roi_width, BWfinal)
+    
     idx_list = find(roi_width == min(roi_width))
 
     collar_region.h_start = idx_list(end)
 
-    idx_list = find(roi_width >= max(roi_width)-20)
+    threshold = quantile(roi_width, .3)
+    idx_list = find(roi_width >= threshold)
     collar_region.h_end = idx_list(1)
 
     idx_list1 = find(BWfinal(collar_region.h_start,:)==1)
