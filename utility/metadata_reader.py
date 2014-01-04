@@ -14,15 +14,8 @@ material_opt = ['cotton', 'denim', 'leather', 'cashmere', 'poly']
 class metadata_reader(object):
 
     def __init__(self, product_code, metadata_dir_path):
-        self.attribute = {
-            'clothing_category': None,
-            'collar': None,
-            'sleeve_len': None,
-            'pattern': None,
-            'button': None,
-            'material': [],
-            'pair_item': []
-        }
+        
+        
         path_pattern = "%s/*/%s.txt"%(metadata_dir_path, product_code)
         ret_path = glob.glob(path_pattern)
         assert(len(ret_path)>0)
@@ -30,6 +23,26 @@ class metadata_reader(object):
         f = open(self.img_path)
         json_str = f.read()
         self.metadata = json.loads(json_str)
+        
+        if self.metadata['clothing_category'] in lower_part_category:
+            self.attribute = {
+                'clothing_category': None,
+                'pattern': None,
+                'material': [],
+                'pair_item': [],
+                'pants_len': None
+            }
+        else: # upper part
+            self.attribute = {
+                'clothing_category': None,
+                'collar': None,
+                'sleeve_len': None,
+                'pattern': None,
+                'button': None,
+                'material': [],
+                'pair_item': []
+            }
+
         self.metadata_dir_path = metadata_dir_path
         #print self.metadata['pair_item']
         self.metadata['pair_item'] = self._trim_non_exist_pair_item(self.metadata['pair_item'])
@@ -50,43 +63,6 @@ class metadata_reader(object):
 
     def _fill_attr(self):
         self.attribute['clothing_category'] = self.metadata['clothing_category']
-
-        if self.metadata['clothing_category'] in lower_part_category:
-            if self.metadata['clothing_category'] == 'Shorts':
-                self.attribute['pants_len'] = "short"
-            else:
-                self.attribute['pants_len'] = "long"
-
-        #default attribute setting
-        if self.metadata['clothing_category'] == 'T-Shirts':
-            self.attribute['sleeve_len'] = sleeve_opt[1]  # short sleeve
-        elif self.metadata['clothing_category'] == 'Knitwear':
-            self.attribute['sleeve_len'] = sleeve_opt[0]  # long sleeve
-            if self.is_str_in_field('CARDIGANS', ['pageClass']):
-                self.attribute['button'] = 'yes'
-
-        elif self.metadata['clothing_category'] == 'Coats and Jackets':
-            self.attribute['sleeve_len'] = sleeve_opt[0]  # long sleeve
-
-        # shirts, not t-shirts
-        elif 'Shirts' in self.metadata['clothing_category']:
-            self.attribute['button'] = 'yes'
-            self.attribute['collar'] = 'shirt-collar'
-            
-        elif self.metadata['clothing_category']=='Polos':
-            self.attribute['collar'] = 'shirt-collar'
-            
-
-                                
-
-        for opt in sleeve_opt:
-            if self.is_str_in_field(opt, ['product_name', 'pageClass', 'detail_care']):
-                self.attribute['sleeve_len'] = opt
-                break
-        for opt in collar_opt:
-            if self.is_str_in_field(opt, ['product_name', 'pageClass', 'detail_care']):
-                self.attribute['collar'] = opt
-                break
         for opt in pattern_opt:
             if self.is_str_in_field(opt, ['product_name', 'pageClass', 'detail_care']):
                 self.attribute['pattern'] = opt
@@ -95,6 +71,42 @@ class metadata_reader(object):
             if self.is_str_in_field(opt, ['product_name','detail_care']):
                 if opt not in self.attribute['material']:
                     self.attribute['material'].append(opt)
+
+
+        if self.metadata['clothing_category'] in lower_part_category:
+            if self.metadata['clothing_category'] == 'Shorts':
+                self.attribute['pants_len'] = "short"
+            else:
+                self.attribute['pants_len'] = "long"
+        else: # upper part
+            #default attribute setting
+            if self.metadata['clothing_category'] == 'T-Shirts':
+                self.attribute['sleeve_len'] = sleeve_opt[1]  # short sleeve
+            elif self.metadata['clothing_category'] == 'Knitwear':
+                self.attribute['sleeve_len'] = sleeve_opt[0]  # long sleeve
+                if self.is_str_in_field('CARDIGANS', ['pageClass']):
+                    self.attribute['button'] = 'yes'
+
+            elif self.metadata['clothing_category'] == 'Coats and Jackets':
+                self.attribute['sleeve_len'] = sleeve_opt[0]  # long sleeve
+
+            # shirts, not t-shirts
+            elif 'Shirts' in self.metadata['clothing_category']:
+                self.attribute['button'] = 'yes'
+                self.attribute['collar'] = 'shirt-collar'
+                
+            elif self.metadata['clothing_category']=='Polos':
+                self.attribute['collar'] = 'shirt-collar'
+                
+            for opt in sleeve_opt:
+                if self.is_str_in_field(opt, ['product_name', 'pageClass', 'detail_care']):
+                    self.attribute['sleeve_len'] = opt
+                    break
+            for opt in collar_opt:
+                if self.is_str_in_field(opt, ['product_name', 'pageClass', 'detail_care']):
+                    self.attribute['collar'] = opt
+                    break
+        
 
 
     def is_str_in_field(self, keyword, keys):
