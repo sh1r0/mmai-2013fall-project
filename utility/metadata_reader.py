@@ -53,7 +53,7 @@ class metadata_reader(object):
 
         if self.metadata['clothing_category'] in lower_part_category:
             if self.metadata['clothing_category'] == 'Shorts':
-                self.attribuet['pants_len'] = "short"
+                self.attribute['pants_len'] = "short"
             else:
                 self.attribute['pants_len'] = "long"
 
