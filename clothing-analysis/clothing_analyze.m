@@ -4,6 +4,10 @@ function [upper, lower] = clothing_analyze(img_path)
 
 	upper_im_path = [img_path(1:end-4) '_upper.jpg'];
 	lower_im_path = [img_path(1:end-4) '_lower.jpg'];
+	sleeve_im_path = [img_path(1:end-4) '_sleeve.jpg'];
+	sleeve_length = sleeve_length_detector(sleeve_im_path);
+	fprintf('%s\n',sleeve_length);
+
 	gabor_cmd = 'gabor -i ';
 	if ~ispc()
 		gabor_cmd = ['./' gabor_cmd];
