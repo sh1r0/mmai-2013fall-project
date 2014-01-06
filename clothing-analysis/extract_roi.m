@@ -12,7 +12,7 @@ function pose = extract_roi(img_path)
 	upper_part = im((upper_center_y-upper_half_width):(upper_center_y+upper_half_width), (upper_center_x-upper_half_width):(upper_center_x+upper_half_width), :);
 	imwrite(upper_part, [img_path(1:end-4) '_upper.jpg']);
 
-	%extract sleeve part
+	% extract sleeve part
 	sleeve_half_width = round((pose.left_shoulder_x - pose.right_shoulder_x)*0.3);
 	sleeve_region.h_start = pose.left_shoulder_y;
 	sleeve_region.h_end = pose.left_hand_y;
@@ -20,9 +20,6 @@ function pose = extract_roi(img_path)
 	sleeve_region.w_end = max(pose.left_shoulder_x,pose.left_hand_x)+sleeve_half_width;
 	sleeve_part = im(sleeve_region.h_start: sleeve_region.h_end, sleeve_region.w_start: sleeve_region.w_end, :);
 	imwrite(sleeve_part, [img_path(1:end-4) '_sleeve.jpg']);
-	imshow(sleeve_part);
-	
-    
 
 	% extract lower part
 	lower_center_x = round((pose.right_hip_x + pose.right_knee_x)/2);
@@ -32,7 +29,7 @@ function pose = extract_roi(img_path)
 	imwrite(lower_part, [img_path(1:end-4) '_lower.jpg']);
 
 	% highlight roi
-	%{
+
 	shapeInserter = vision.ShapeInserter('BorderColor','Custom', 'CustomBorderColor', uint8([255 0 0]));
 	rectangle = int32([upper_center_x-upper_half_width upper_center_y-upper_half_width 2*upper_half_width 2*upper_half_width;
 		lower_center_x-lower_half_width lower_center_y-lower_half_width 2*lower_half_width 2*lower_half_width]);
@@ -55,5 +52,4 @@ function pose = extract_roi(img_path)
 			]);
 	J = step(shapeInserter, J, l);
 	imwrite(J, [img_path(1:end-4) '_pose.jpg']);
-	%}
 end

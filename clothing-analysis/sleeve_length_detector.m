@@ -15,15 +15,15 @@ function sleeve_type = sleeve_length_detector(sleeve_img_path)
     % Detect Skin
     [r, c] = find(Cb>=77 & Cb<=127 & Cr>=133 & Cr<=173);
     numind = size(r, 1);
-    ratio = numind/double(width*height)
+    ratio = numind/double(width*height);
     % Mark Skin Pixels
     for i=1:numind
         out(r(i),c(i),:) = [0 0 255];
         bin(r(i),c(i)) = 1;
     end
-    imshow(img);
-    figure; imshow(out);
-    figure; imshow(bin);
+    % figure, imshow(img);
+    % figure; imshow(out);
+    % figure; imshow(bin);
     sleeve_type = 'unknown';
     % ratio may need to be adjust
     if (ratio > 0.66)
