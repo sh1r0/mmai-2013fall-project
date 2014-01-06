@@ -66,7 +66,7 @@ function [upper, lower] = clothing_analyze(img_path)
 
 	% ====== RETRIVAL RESULTS ====== %
 	fid = fopen('result.html', 'a');
-	fprintf(fid, '<html>\n<title>Results</title>\n<body>\n<table border="1" align=center width="70%%">\n<tr align=center>\n<td colspan="4"><img src="%s" id="query"></td>\n</tr>\n', [img_path(1:end-4) '_pose.jpg']);
+	fprintf(fid, '<html>\n<title>Results</title>\n<body>\n<table border="1" align=center width="70%%">\n<tr align=center>\n<td colspan="4"><a href="%s"><img src="%s" id="query"></a></td>\n</tr>\n', [img_path(1:end-4) '_pose.jpg'], [img_path(1:end-4) '_pose.jpg']);
 	fprintf(fid, '<tr align=center>\n<td colspan="2">Sleeve Type</td>\n<td colspan="2">%s</td>\n</tr>\n', upper.sleeve_type);
 
 	categories = {'HSV', 'Gabor', 'HOG'};
@@ -106,6 +106,10 @@ function [upper, lower] = clothing_analyze(img_path)
 		for j = 1:3
 			rcmd_items = upper_dataset{upper.sortIndex(j,i)}.pair_item;
 
+			if exist(['rcmd_' upper_products{(i-1)*3+j} '.html']) == 2
+				continue;
+			end
+
 			fid = fopen(['rcmd_' upper_products{(i-1)*3+j} '.html'], 'a');
 			fprintf(fid, '<html>\n<title>Results</title>\n<body>\n<table border="1" align=center width="70%%">\n');
 
@@ -121,6 +125,10 @@ function [upper, lower] = clothing_analyze(img_path)
 	for i = 1:3
 		for j = 1:3
 			rcmd_items = lower_dataset{lower.sortIndex(j,i)}.pair_item;
+
+			if exist(['rcmd_' lower_products{(i-1)*3+j} '.html']) == 2
+				continue;
+			end
 
 			fid = fopen(['rcmd_' lower_products{(i-1)*3+j} '.html'], 'a');
 			fprintf(fid, '<html>\n<title>Results</title>\n<body>\n<table border="1" align=center width="70%%">\n');

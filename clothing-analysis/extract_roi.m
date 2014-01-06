@@ -32,7 +32,8 @@ function pose = extract_roi(img_path)
 
 	shapeInserter = vision.ShapeInserter('BorderColor','Custom', 'CustomBorderColor', uint8([255 0 0]));
 	rectangle = int32([upper_center_x-upper_half_width upper_center_y-upper_half_width 2*upper_half_width 2*upper_half_width;
-		lower_center_x-lower_half_width lower_center_y-lower_half_width 2*lower_half_width 2*lower_half_width]);
+		lower_center_x-lower_half_width lower_center_y-lower_half_width 2*lower_half_width 2*lower_half_width
+		sleeve_region.w_start sleeve_region.h_start sleeve_region.w_end-sleeve_region.w_start sleeve_region.h_end-sleeve_region.h_start]);
 	J = step(shapeInserter, im, rectangle);
 
 	shapeInserter = vision.ShapeInserter('Shape','Lines','BorderColor','Custom', 'CustomBorderColor', uint8([100 255 255]));
