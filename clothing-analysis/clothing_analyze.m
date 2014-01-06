@@ -11,7 +11,7 @@ function [upper, lower] = clothing_analyze(img_path)
 		gabor_cmd = ['./' gabor_cmd];
 	end
 
-	% ====== UPPER ======
+	% ====== UPPER ====== %
 	% hsv hist
 	upper.hsv = hsv_hist(upper_im_path);
 	% gabor
@@ -36,7 +36,7 @@ function [upper, lower] = clothing_analyze(img_path)
 
 	[upper.sortedValues,upper.sortIndex] = sort(upper.difference, 1, 'ascend');
 
-	% ====== LOWER ======
+	% ====== LOWER ====== %
 	% hsv hist
 	lower.hsv = hsv_hist(lower_im_path);
 	% gabor
@@ -59,30 +59,78 @@ function [upper, lower] = clothing_analyze(img_path)
 
 	[lower.sortedValues,lower.sortIndex] = sort(lower.difference, 1, 'ascend');
 
-	% generate result htmls
+	% remove existed htmls
 	if exist('result.html') == 2
-		delete('result.html');
+		delete('*.html');
 	end
+
+	% ====== RETRIVAL RESULTS ====== %
 	fid = fopen('result.html', 'a');
 	fprintf(fid, '<html>\n<title>Results</title>\n<body>\n<table border="1" align=center width="70%%">\n<tr align=center>\n<td colspan="4"><img src="%s" id="query"></td>\n</tr>\n', [img_path(1:end-4) '_pose.jpg']);
 	fprintf(fid, '<tr align=center>\n<td colspan="2">Sleeve Type</td>\n<td colspan="2">%s</td>\n</tr>\n', upper.sleeve_type);
 
 	categories = {'HSV', 'Gabor', 'HOG'};
+
+	upper_products = {};
 	for i = 1:3
+		for j = 1:3
+			upper_products = [upper_products upper_dataset{upper.sortIndex(j,i)}.product_code];
+		end
+
 		fprintf(fid, '<tr align=center>\n<td>%s</td>\n', categories{i});
-		fprintf(fid, '<td><a href=""><img class="autoResizeImage" src="%s"></a></td>\n', ['../../clothing_dataset_v3/images/' upper_dataset{upper.sortIndex(1,i)}.product_code '_p.jpg']);
-		fprintf(fid, '<td><a href=""><img class="autoResizeImage" src="%s"></a></td>\n', ['../../clothing_dataset_v3/images/' upper_dataset{upper.sortIndex(2,i)}.product_code '_p.jpg']);
-		fprintf(fid, '<td><a href=""><img class="autoResizeImage" src="%s"></a></td>\n', ['../../clothing_dataset_v3/images/' upper_dataset{upper.sortIndex(3,i)}.product_code '_p.jpg']);
-		fprintf(fid, '</tr>\n');
-	end
-	for i = 1:3
-		fprintf(fid, '<tr align=center>\n<td>%s</td>\n', categories{i});
-		fprintf(fid, '<td><a href=""><img class="autoResizeImage" src="%s"></a></td>\n', ['../../clothing_dataset_v3/images/' lower_dataset{lower.sortIndex(1,i)}.product_code '_p.jpg']);
-		fprintf(fid, '<td><a href=""><img class="autoResizeImage" src="%s"></a></td>\n', ['../../clothing_dataset_v3/images/' lower_dataset{lower.sortIndex(2,i)}.product_code '_p.jpg']);
-		fprintf(fid, '<td><a href=""><img class="autoResizeImage" src="%s"></a></td>\n', ['../../clothing_dataset_v3/images/' lower_dataset{lower.sortIndex(3,i)}.product_code '_p.jpg']);
+		for j = 1:3
+			fprintf(fid, '<td><a href="%s"><img class="autoResizeImage" src="%s"></a></td>\n', ['rcmd_' upper_products{(i-1)*3+j} '.html'] ,['../../clothing_dataset_v3/images/' upper_products{(i-1)*3+j} '_p.jpg']);
+		end
 		fprintf(fid, '</tr>\n');
 	end
 
+	lower_products = {};
+	for i = 1:3
+		for j = 1:3
+			lower_products = [lower_products lower_dataset{lower.sortIndex(j,i)}.product_code];
+		end
+
+		fprintf(fid, '<tr align=center>\n<td>%s</td>\n', categories{i});
+		for j = 1:3
+			fprintf(fid, '<td><a href="%s"><img class="autoResizeImage" src="%s"></a></td>\n', ['rcmd_' lower_products{(i-1)*3+j} '.html'], ['../../clothing_dataset_v3/images/' lower_products{(i-1)*3+j} '_p.jpg']);
+		end
+		fprintf(fid, '</tr>\n');
+	end
+
+
 	fprintf(fid, '</table>\n</body>\n<style type="text/css">\n.autoResizeImage {\nmax-width: 100%%;\nheight: auto;\nwidth: 100%%;\n}\n#query {max-height: 500px;}\n</style>\n</html>\n');
 	fclose(fid);
+
+	% ====== RECOMMENDATION PAGES ====== %
+	for i = 1:3
+		for j = 1:3
+			rcmd_items = upper_dataset{upper.sortIndex(j,i)}.pair_item;
+
+			fid = fopen(['rcmd_' upper_products{(i-1)*3+j} '.html'], 'a');
+			fprintf(fid, '<html>\n<title>Results</title>\n<body>\n<table border="1" align=center width="70%%">\n');
+
+			for k = 1:length(rcmd_items)
+				fprintf(fid, '<tr align=center>\n<td><img src="%s"></td>\n</tr>\n', ['../../clothing_dataset_v3/images/' rcmd_items{k} '_ou.jpg']);
+			end
+
+			fprintf(fid, '</table>\n</body>\n</html>\n');
+			fclose(fid);
+		end
+	end
+
+	for i = 1:3
+		for j = 1:3
+			rcmd_items = lower_dataset{lower.sortIndex(j,i)}.pair_item;
+
+			fid = fopen(['rcmd_' lower_products{(i-1)*3+j} '.html'], 'a');
+			fprintf(fid, '<html>\n<title>Results</title>\n<body>\n<table border="1" align=center width="70%%">\n');
+
+			for k = 1:length(rcmd_items)
+				fprintf(fid, '<tr align=center>\n<td><img src="%s"></td>\n</tr>\n', ['../../clothing_dataset_v3/images/' rcmd_items{k} '_ou.jpg']);
+			end
+
+			fprintf(fid, '</table>\n</body>\n</html>\n');
+			fclose(fid);
+		end
+	end
 end
