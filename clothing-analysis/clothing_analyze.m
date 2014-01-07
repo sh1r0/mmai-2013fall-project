@@ -23,6 +23,7 @@ function [upper, lower] = clothing_analyze(img_path)
 	upper.hog = HOG(upper_im_path);
 	% sleeve type
 	upper.sleeve_type = sleeve_length_detector(sleeve_im_path);
+	upper.pattern = pattern_detector(upper.gabor);
 
 	load ../data/upper_dataset.mat;
 	Nimages = length(upper_dataset);
@@ -68,6 +69,7 @@ function [upper, lower] = clothing_analyze(img_path)
 	fid = fopen('result.html', 'a');
 	fprintf(fid, '<html>\n<title>Results</title>\n<body>\n<table border="1" align=center width="70%%">\n<tr align=center>\n<td colspan="4"><a href="%s"><img src="%s" id="query"></a></td>\n</tr>\n', [img_path(1:end-4) '_pose.jpg'], [img_path(1:end-4) '_pose.jpg']);
 	fprintf(fid, '<tr align=center>\n<td colspan="2">Sleeve Type</td>\n<td colspan="2">%s</td>\n</tr>\n', upper.sleeve_type);
+	fprintf(fid, '<tr align=center>\n<td colspan="2">Pattern Type</td>\n<td colspan="2">%s</td>\n</tr>\n', upper.pattern);
 
 	categories = {'HSV', 'Gabor', 'HOG'};
 
