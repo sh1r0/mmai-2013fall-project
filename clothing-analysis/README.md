@@ -15,3 +15,6 @@ You can use `demo.m` to test whether the setup is alright.
 ##Extracted Features
 - global color moments in YCbCr color space
 - log Gabor
+
+##Demo Result
+![Semo Result](http://1.bp.blogspot.com/-XH07pkgBcrs/VABNznS5ErI/AAAAAAAAASg/pSKxvzzBuHQ/s1600/1409303908483.png)
